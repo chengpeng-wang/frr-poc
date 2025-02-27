@@ -9,6 +9,7 @@
 
 #include <zebra.h>
 
+// #include "sbuf.h"
 #include "getopt.h"
 #include "frrevent.h"
 #include "log.h"
@@ -48,6 +49,7 @@
 #include "isisd/isis_mt.h"
 #include "isisd/fabricd.h"
 #include "isisd/isis_nb.h"
+#include "isisd/isis_tlvs.h"
 #include "isisd/isis_ldp_sync.h"
 
 /* Default configuration file name */
@@ -262,97 +264,97 @@ FRR_DAEMON_INFO(
 );
 /* clang-format on */
 
-/*
- * Main routine of isisd. Parse arguments and handle IS-IS state machine.
- */
-int main(int argc, char **argv, char **envp)
-{
-	int opt;
-	int instance = 1;
+// /*
+//  * Main routine of isisd. Parse arguments and handle IS-IS state machine.
+//  */
+// int main(int argc, char **argv, char **envp)
+// {
+// 	int opt;
+// 	int instance = 1;
 
-#ifdef FABRICD
-	frr_preinit(&fabricd_di, argc, argv);
-#else
-	frr_preinit(&isisd_di, argc, argv);
-#endif
-	frr_opt_add(
-		"I:", longopts,
-		"  -I, --int_num      Set instance number (label-manager)\n");
+// #ifdef FABRICD
+// 	frr_preinit(&fabricd_di, argc, argv);
+// #else
+// 	frr_preinit(&isisd_di, argc, argv);
+// #endif
+// 	frr_opt_add(
+// 		"I:", longopts,
+// 		"  -I, --int_num      Set instance number (label-manager)\n");
 
-	/* Command line argument treatment. */
-	while (1) {
-		opt = frr_getopt(argc, argv, NULL);
+// 	/* Command line argument treatment. */
+// 	while (1) {
+// 		opt = frr_getopt(argc, argv, NULL);
 
-		if (opt == EOF)
-			break;
+// 		if (opt == EOF)
+// 			break;
 
-		switch (opt) {
-		case 0:
-			break;
-		case 'I':
-			instance = atoi(optarg);
-			if (instance < 1 || instance > (unsigned short)-1)
-				zlog_err("Instance %i out of range (1..%u)",
-					 instance, (unsigned short)-1);
-			break;
-		default:
-			frr_help_exit(1);
-		}
-	}
+// 		switch (opt) {
+// 		case 0:
+// 			break;
+// 		case 'I':
+// 			instance = atoi(optarg);
+// 			if (instance < 1 || instance > (unsigned short)-1)
+// 				zlog_err("Instance %i out of range (1..%u)",
+// 					 instance, (unsigned short)-1);
+// 			break;
+// 		default:
+// 			frr_help_exit(1);
+// 		}
+// 	}
 
-#ifdef FABRICD
-	snprintf(state_path, sizeof(state_path), FABRICD_STATE_NAME);
-#else
-	snprintf(state_path, sizeof(state_path), ISISD_STATE_NAME);
-#endif
-	snprintf(state_compat_path, sizeof(state_compat_path),
-		 ISISD_COMPAT_STATE_NAME);
+// #ifdef FABRICD
+// 	snprintf(state_path, sizeof(state_path), FABRICD_STATE_NAME);
+// #else
+// 	snprintf(state_path, sizeof(state_path), ISISD_STATE_NAME);
+// #endif
+// 	snprintf(state_compat_path, sizeof(state_compat_path),
+// 		 ISISD_COMPAT_STATE_NAME);
 
-	/* thread master */
-	isis_master_init(frr_init());
-	master = im->master;
-	/*
-	 *  initializations
-	 */
-	libagentx_init();
-	cmd_init_config_callbacks(isis_config_start, isis_config_end);
-	isis_error_init();
-	access_list_init();
-	access_list_add_hook(isis_filter_update);
-	access_list_delete_hook(isis_filter_update);
-	isis_vrf_init();
-	prefix_list_init();
-	prefix_list_add_hook(isis_prefix_list_update);
-	prefix_list_delete_hook(isis_prefix_list_update);
-	isis_init();
-	isis_circuit_init();
-#ifdef FABRICD
-	isis_vty_daemon_init();
-#endif /* FABRICD */
-#ifndef FABRICD
-	isis_cli_init();
-#endif /* ifndef FABRICD */
-	isis_spf_init();
-	isis_redist_init();
-	isis_route_map_init();
-	isis_mpls_te_init();
-	isis_sr_init();
-	isis_srv6_init();
-	lsp_init();
-	mt_init();
+// 	/* thread master */
+// 	isis_master_init(frr_init());
+// 	master = im->master;
+// 	/*
+// 	 *  initializations
+// 	 */
+// 	libagentx_init();
+// 	cmd_init_config_callbacks(isis_config_start, isis_config_end);
+// 	isis_error_init();
+// 	access_list_init();
+// 	access_list_add_hook(isis_filter_update);
+// 	access_list_delete_hook(isis_filter_update);
+// 	isis_vrf_init();
+// 	prefix_list_init();
+// 	prefix_list_add_hook(isis_prefix_list_update);
+// 	prefix_list_delete_hook(isis_prefix_list_update);
+// 	isis_init();
+// 	isis_circuit_init();
+// #ifdef FABRICD
+// 	isis_vty_daemon_init();
+// #endif /* FABRICD */
+// #ifndef FABRICD
+// 	isis_cli_init();
+// #endif /* ifndef FABRICD */
+// 	isis_spf_init();
+// 	isis_redist_init();
+// 	isis_route_map_init();
+// 	isis_mpls_te_init();
+// 	isis_sr_init();
+// 	isis_srv6_init();
+// 	lsp_init();
+// 	mt_init();
 
-#ifndef FABRICD
-	isis_affinity_map_init();
-#endif /* ifndef FABRICD */
+// #ifndef FABRICD
+// 	isis_affinity_map_init();
+// #endif /* ifndef FABRICD */
 
-	isis_zebra_init(master, instance);
-	isis_bfd_init(master);
-	isis_ldp_sync_init();
-	fabricd_init();
+// 	isis_zebra_init(master, instance);
+// 	isis_bfd_init(master);
+// 	isis_ldp_sync_init();
+// 	fabricd_init();
 
-	frr_config_fork();
-	frr_run(master);
+// 	frr_config_fork();
+// 	frr_run(master);
 
-	/* Not reached. */
-	exit(0);
-}
+// 	/* Not reached. */
+// 	exit(0);
+// }

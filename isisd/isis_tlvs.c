@@ -5442,9 +5442,9 @@ static int unpack_tlv_router_cap(enum isis_tlv_context context,
 	uint8_t size;
 	int num_msd;
 
-	sbuf_push(log, indent, "Unpacking Router Capability TLV...\n");
+	// sbuf_push(log, indent, "Unpacking Router Capability TLV...\n");
 	if (tlv_len < ISIS_ROUTER_CAP_SIZE) {
-		sbuf_push(log, indent, "WARNING: Unexpected TLV size\n");
+		// sbuf_push(log, indent, "WARNING: Unexpected TLV size\n");
 		stream_forward_getp(s, tlv_len);
 		return 0;
 	}
@@ -5477,9 +5477,9 @@ static int unpack_tlv_router_cap(enum isis_tlv_context context,
 		length = stream_getc(s);
 
 		if (length > STREAM_READABLE(s) || length > subtlv_len - 2) {
-			sbuf_push(
-				log, indent,
-				"WARNING: Router Capability subTLV length too large compared to expected size\n");
+			// sbuf_push(
+			// 	log, indent,
+			// 	"WARNING: Router Capability subTLV length too large compared to expected size\n");
 			stream_forward_getp(s, STREAM_READABLE(s));
 			return 0;
 		}
@@ -5529,7 +5529,7 @@ static int unpack_tlv_router_cap(enum isis_tlv_context context,
 			    || (rcap->srgb.lower_bound <= MPLS_LABEL_RESERVED_MAX)
 			    || ((rcap->srgb.lower_bound + rcap->srgb.range_size - 1)
 				> MPLS_LABEL_UNRESERVED_MAX)) {
-				sbuf_push(log, indent, "Invalid label range. Reset SRGB\n");
+				// sbuf_push(log, indent, "Invalid label range. Reset SRGB\n");
 				rcap->srgb.lower_bound = 0;
 				rcap->srgb.range_size = 0;
 			}
@@ -5598,7 +5598,7 @@ static int unpack_tlv_router_cap(enum isis_tlv_context context,
 			    || (rcap->srlb.lower_bound <= MPLS_LABEL_RESERVED_MAX)
 			    || ((rcap->srlb.lower_bound + rcap->srlb.range_size - 1)
 				> MPLS_LABEL_UNRESERVED_MAX)) {
-				sbuf_push(log, indent, "Invalid label range. Reset SRLB\n");
+				// sbuf_push(log, indent, "Invalid label range. Reset SRLB\n");
 				rcap->srlb.lower_bound = 0;
 				rcap->srlb.range_size = 0;
 			}
@@ -5609,14 +5609,14 @@ static int unpack_tlv_router_cap(enum isis_tlv_context context,
 
 			break;
 		case ISIS_SUBTLV_NODE_MSD:
-			sbuf_push(log, indent,
-				  "Unpacking Node MSD sub-TLV...\n");
+			// sbuf_push(log, indent,
+			// 	  "Unpacking Node MSD sub-TLV...\n");
 
 			/* Check that MSD is correctly formated */
 			if (length % 2) {
-				sbuf_push(
-					log, indent,
-					"WARNING: Unexpected MSD sub-TLV length\n");
+				// sbuf_push(
+				// 	log, indent,
+				// 	"WARNING: Unexpected MSD sub-TLV length\n");
 				stream_forward_getp(s, length);
 				break;
 			}
@@ -5662,10 +5662,10 @@ static int unpack_tlv_router_cap(enum isis_tlv_context context,
 					break;
 				default:
 					/* Unknown MSD, let's skip it */
-					sbuf_push(
-						log, indent,
-						"WARNING: Skipping unknown MSD Type %hhu (1 byte)\n",
-						msd_type);
+					// sbuf_push(
+					// 	log, indent,
+					// 	"WARNING: Skipping unknown MSD Type %hhu (1 byte)\n",
+					// 	msd_type);
 					stream_forward_getp(s, 1);
 				}
 			}
@@ -5732,10 +5732,10 @@ static int unpack_tlv_router_cap(enum isis_tlv_context context,
 					stream_forward_getp(s, subsubtlv_len);
 					break;
 				default:
-					sbuf_push(
-						log, indent,
-						"Received an unsupported Flex-Algo sub-TLV type %u\n",
-						subsubtlv_type);
+					// sbuf_push(
+					// 	log, indent,
+					// 	"Received an unsupported Flex-Algo sub-TLV type %u\n",
+					// 	subsubtlv_type);
 					fad->fad.unsupported_subtlv = true;
 					stream_forward_getp(s, subsubtlv_len);
 					break;
@@ -5745,25 +5745,25 @@ static int unpack_tlv_router_cap(enum isis_tlv_context context,
 			break;
 #endif /* ifndef FABRICD */
 		case ISIS_SUBTLV_SRV6_CAPABILITIES:
-			sbuf_push(log, indent,
-				  "Unpacking SRv6 Capabilities sub-TLV...\n");
+			// sbuf_push(log, indent,
+			// 	  "Unpacking SRv6 Capabilities sub-TLV...\n");
 			/* Check that SRv6 capabilities sub-TLV is correctly
 			 * formated */
 			if (length < ISIS_SUBTLV_SRV6_CAPABILITIES_SIZE) {
-				sbuf_push(
-					log, indent,
-					"WARNING: Unexpected SRv6 Capabilities sub-TLV size (expected %d or more bytes, got %hhu)\n",
-					ISIS_SUBTLV_SRV6_CAPABILITIES_SIZE,
-					length);
+				// sbuf_push(
+				// 	log, indent,
+				// 	"WARNING: Unexpected SRv6 Capabilities sub-TLV size (expected %d or more bytes, got %hhu)\n",
+				// 	ISIS_SUBTLV_SRV6_CAPABILITIES_SIZE,
+				// 	length);
 				stream_forward_getp(s, length);
 				break;
 			}
 			/* Only one SRv6 capabilities is supported. Skip
 			 * subsequent one */
 			if (rcap->srv6_cap.is_srv6_capable) {
-				sbuf_push(
-					log, indent,
-					"WARNING: SRv6 Capabilities sub-TLV present multiple times, ignoring.\n");
+				// sbuf_push(
+				// 	log, indent,
+				// 	"WARNING: SRv6 Capabilities sub-TLV present multiple times, ignoring.\n");
 				stream_forward_getp(s, length);
 				break;
 			}
@@ -5777,10 +5777,10 @@ static int unpack_tlv_router_cap(enum isis_tlv_context context,
 			 * by IS-IS.
 			 */
 			if (length > ISIS_SUBTLV_SRV6_CAPABILITIES_SIZE)
-				sbuf_push(
-					log, indent,
-					"Skipping unknown sub-TLV (%hhu bytes)\n",
-					length);
+				// sbuf_push(
+				// 	log, indent,
+				// 	"Skipping unknown sub-TLV (%hhu bytes)\n",
+				// 	length);
 			stream_forward_getp(
 				s, length - ISIS_SUBTLV_SRV6_CAPABILITIES_SIZE);
 
@@ -8457,4 +8457,61 @@ void isis_tlvs_add_srv6_locator(struct isis_tlvs *tlvs, uint16_t mtid,
 	struct isis_item_list *l;
 	l = isis_get_mt_items(&tlvs->srv6_locator, mtid);
 	append_item(l, (struct isis_item *)loc_tlv);
+}
+
+
+int main(void)
+{
+    uint8_t tlv_len = 8;  
+    uint8_t *tlv_data = malloc(5);
+    if (!tlv_data) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return 1;
+    }
+    
+    tlv_data[0] = 192;  /* 192 */
+    tlv_data[1] = 168;  /* 168 */
+    tlv_data[2] = 0;    /* 0 */
+    tlv_data[3] = 1;    /* 1 */
+    tlv_data[4] = 0xAA; /* Flags */
+
+    /*
+     * Allocate a stream object with space for 5 bytes of data.
+     * The total allocated size equals sizeof(struct stream) + 5.
+     */
+    struct stream *s = malloc(sizeof(struct stream) + 5);
+    if (!s) {
+        fprintf(stderr, "Memory allocation failed for stream\n");
+        free(tlv_data);
+        return 1;
+    }
+    s->getp = 0;
+    s->endp = 5;           /* Actual data length */
+    s->size  = tlv_len;     /* Fake total size (8 bytes) */
+    memcpy(s->data, tlv_data, 5);
+
+    /*
+     * Instead of declaring a local variable of type 'struct sbuf' (which is incomplete),
+     * allocate it via sbuf_new() (provided by sbuf.h) so that its storage size is known.
+     */
+    // struct sbuf *log = sbuf_new();
+    // if (!log) {
+    //     fprintf(stderr, "sbuf allocation failed\n");
+    //     free(tlv_data);
+    //     free(s);
+    //     return 1;
+    // }
+
+    struct isis_tlvs tlvs;
+    memset(&tlvs, 0, sizeof(tlvs));
+
+    printf("Begin to invoke unpack_tlv_router_cap...\n");
+    unpack_tlv_router_cap(ISIS_CONTEXT_MAX, 0, tlv_len, s, NULL, &tlvs, 0);
+
+    free(tlv_data);
+    free(s);
+    if (tlvs.router_cap)
+        free(tlvs.router_cap);
+    // sbuf_free(log);
+    return 0;
 }
