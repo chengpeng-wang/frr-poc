@@ -5445,17 +5445,26 @@ static int unpack_tlv_router_cap(enum isis_tlv_context context,
 	// sbuf_push(log, indent, "Unpacking Router Capability TLV...\n");
 	if (tlv_len < ISIS_ROUTER_CAP_SIZE) {
 		// sbuf_push(log, indent, "WARNING: Unexpected TLV size\n");
+		printf("WARNING 5448: Unexpected TLV size\n");
 		stream_forward_getp(s, tlv_len);
 		return 0;
 	}
 
+	printf("WARNING 5453: Unexpected TLV size\n");
 	if (!tlvs->router_cap) {
+		printf("WARNING 5455: Unexpected TLV size\n");
+
 		/* First Router Capability TLV.
 		 * Allocate router cap structure and initialize SR Algorithms */
 		tlvs->router_cap = XCALLOC(MTYPE_ISIS_TLV,
 					   sizeof(struct isis_router_cap));
-		for (int i = 0; i < SR_ALGORITHM_COUNT; i++)
+		printf("WARNING 5461: Unexpected TLV size\n");
+
+		for (int i = 0; i < SR_ALGORITHM_COUNT; i++) {
+			printf("WARNING 5464: Unexpected TLV size\n");
 			tlvs->router_cap->algo[i] = SR_ALGORITHM_UNSET;
+		}
+			
 	}
 
 	rcap = tlvs->router_cap;
@@ -8487,20 +8496,8 @@ int main(void)
     }
     s->getp = 0;
     s->endp = 5;           /* Actual data length */
-    s->size  = tlv_len;     /* Fake total size (8 bytes) */
+    s->size  = 5;     /* Fake total size (8 bytes) */
     memcpy(s->data, tlv_data, 5);
-
-    /*
-     * Instead of declaring a local variable of type 'struct sbuf' (which is incomplete),
-     * allocate it via sbuf_new() (provided by sbuf.h) so that its storage size is known.
-     */
-    // struct sbuf *log = sbuf_new();
-    // if (!log) {
-    //     fprintf(stderr, "sbuf allocation failed\n");
-    //     free(tlv_data);
-    //     free(s);
-    //     return 1;
-    // }
 
     struct isis_tlvs tlvs;
     memset(&tlvs, 0, sizeof(tlvs));
